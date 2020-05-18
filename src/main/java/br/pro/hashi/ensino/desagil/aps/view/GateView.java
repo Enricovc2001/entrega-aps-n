@@ -17,10 +17,12 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
     // Checkboxes
     private final JCheckBox In0Box;
     private final JCheckBox In1Box;
+    private final JCheckBox In2Box;
 
     // Switches (atributos da classe Switch para selecionar checkboxes)
     private final Switch Switch0;
     private final Switch Switch1;
+    private final Switch Switch2;
     private final Light light;
     private final Image image;
     // Novos atributos necessários para esta versão da interface.
@@ -34,51 +36,81 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
 
         In0Box = new JCheckBox();
         In1Box = new JCheckBox();
+        In2Box = new JCheckBox();
+
         Switch0 = new Switch();
         Switch1 = new Switch();
+        Switch2 = new Switch();
         light = new Light(255, 0, 0);
 
         // Adiciona as Labels & Checkboxs criadas anteriormente na ordem de exibição
         // Lembrando que a classe extends de JPanel para funcionar como contêiner.
-        if (gate.getInputSize() != 1) {
+        if (gate.getInputSize() == 3) {
+            // Painel de exibição para gates com inputSize != 1
+            // Portas: AND, NAND, OR, XOR
+            add(In0Box, 10, 29, 20, 20);
+            add(In1Box, 10, 68, 20, 20);
+            add(In2Box, 10, 48, 20, 20);
+
+            // Pega a imagem de cada porta para desenhar posteriormente
+
+            // Adiciona ActionListener para as entradas e desabilita a edição da box de saida.
+            In0Box.addActionListener(this);
+            In1Box.addActionListener(this);
+            In2Box.addActionListener(this);
+        }
+
+
+        if (gate.getInputSize() == 2) {
             // Painel de exibição para gates com inputSize != 1
             // Portas: AND, NAND, OR, XOR
             add(In0Box, 10, 29, 20, 20);
             add(In1Box, 10, 68, 20, 20);
 
             // Pega a imagem de cada porta para desenhar posteriormente
-            String name = gate.toString() + ".png";
-            URL url = getClass().getClassLoader().getResource(name);
-            image = getToolkit().getImage(url);
+
 
             // Adiciona ActionListener para as entradas e desabilita a edição da box de saida.
             In0Box.addActionListener(this);
             In1Box.addActionListener(this);
-        } else {
+
+
+        }
+        if (gate.getInputSize() == 1) {
             // Painel de exibição para gates com inputSize = 1
             // Portas: NOT
             add(In0Box, 10, 48, 20, 20);
 
-            // Pega a imagem da porta NOT
-            String name = gate.toString() + ".png";
-            URL url = getClass().getClassLoader().getResource(name);
-            image = getToolkit().getImage(url);
 
             // Adiciona ActionListener para as entradas e desabilita a edição da box de saida.
             In0Box.addActionListener(this);
+
         }
+        String name = gate.toString() + ".png";
+        URL url = getClass().getClassLoader().getResource(name);
+        image = getToolkit().getImage(url);
+
+
+
+
 
         // Conecta os respectivos sinais às entradas
-        if (gate.getInputSize() != 1) {
+        if (gate.getInputSize() == 3) {
             gate.connect(0, Switch0);
             gate.connect(1, Switch1);
-        } else {
-            gate.connect(0, Switch0);
-        }
-        // Conecta o gate ao receiver light
-        light.connect(0, gate);
+            gate.connect(2, Switch2);
+            if (gate.getInputSize() == 2) {
+                gate.connect(0, Switch0);
+                gate.connect(1, Switch1);
+            }
+            if (gate.getInputSize() == 1) {
+                gate.connect(0, Switch0);
+            }
+            // Conecta o gate ao receiver light
+            light.connect(0, gate);
 
-        addMouseListener(this);
+            addMouseListener(this);
+        }
 
         // Atualiza a classe para uma nova iteração
         update();
@@ -100,6 +132,7 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
         // checkbox está selecionada ou não.
         boolean In0State = In0Box.isSelected();
         boolean In1State = In1Box.isSelected();
+        boolean In2State = In2Box.isSelected();
 
         // Utiliza o Switch para identificar o sinais como true or false
         // de acordo com a checkbox selecionada ou não
@@ -111,6 +144,10 @@ public class GateView extends FixedPanel implements ActionListener, MouseListene
             Switch1.turnOn();
         } else
             Switch1.turnOff();
+        if (In2State) {
+            Switch2.turnOn();
+        } else
+            Switch2.turnOff();
 
         // Atualiza a classe para uma nova iteração
         update();

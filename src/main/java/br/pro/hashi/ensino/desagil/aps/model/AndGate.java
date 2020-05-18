@@ -14,6 +14,7 @@ public class AndGate extends Gate {
         not = new NandGate();
         not.connect(0, nand);
         not.connect(1, nand);
+
     }
 
     @Override
